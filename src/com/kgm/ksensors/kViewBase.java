@@ -1,16 +1,20 @@
 package com.kgm.ksensors;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.lang.System;
+import java.util.logging.Logger;
 
 import static android.provider.Settings.*;
 
@@ -64,14 +68,20 @@ public class kViewBase extends LinearLayout
         seeker.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser)
             {
+                if(progress < 1)
+                    return;
+
                 try
                 {
                     android.provider.Settings.System.putInt(context.getContentResolver(),
                             android.provider.Settings.System.SCREEN_BRIGHTNESS, progress);
+                    WindowManager.LayoutParams lp = ((Activity)context).getWindow().getAttributes();
+                    lp.screenBrightness = progress / (float)255;
+                    ((Activity)context).getWindow().setAttributes(lp);
                 }
                 catch(Exception e)
                 {
-
+                    Log.v("Error", e.getMessage());
                 }
             }
             public void onStartTrackingTouch(android.widget.SeekBar seekBar)
