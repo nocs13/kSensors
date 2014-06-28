@@ -31,7 +31,7 @@ public class kViewBase extends LinearLayout
     {
         super(context);
 
-        setBackgroundColor(0x00000000);
+        //setBackgroundColor(0xaa000000);
         setOrientation(LinearLayout.VERTICAL);
         setBackgroundColor(Color.TRANSPARENT);
 
@@ -161,7 +161,7 @@ public class kViewBase extends LinearLayout
       lp.setMargins(20, 20, 20, 20);
 
       TextView tv = new TextView(context);
-      tv.setText("Music");
+      tv.setText("Call Voice");
       addView(tv);
 
       SeekBar seeker = new SeekBar(context);
