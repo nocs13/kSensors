@@ -2,7 +2,9 @@ package com.kgm.ksensors;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.util.Log;
@@ -29,6 +31,7 @@ public class kViewBase extends LinearLayout
     {
         super(context);
 
+        setBackgroundColor(0x00000000);
         setOrientation(LinearLayout.VERTICAL);
         setBackgroundColor(Color.TRANSPARENT);
 
@@ -108,12 +111,15 @@ public class kViewBase extends LinearLayout
 
         SeekBar seeker = new SeekBar(context);
 
-        seeker.setMax(255);
+        final AudioManager am = (AudioManager) ((Activity)context).getSystemService(Activity.AUDIO_SERVICE);
+
+        seeker.setMax(am.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
 
         try
         {
             seeker.setProgress(android.provider.Settings.System.getInt(context.getContentResolver(),
                     Settings.System.VOLUME_MUSIC));
+            seeker.setProgress(am.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
         catch(Exception e)
         {
@@ -129,10 +135,11 @@ public class kViewBase extends LinearLayout
                 {
                     android.provider.Settings.System.putInt(context.getContentResolver(),
                             Settings.System.VOLUME_MUSIC, progress);
+                    am.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
                 }
                 catch(Exception e)
                 {
-
+                  Log.v("Error", e.getMessage());
                 }
             }
             public void onStartTrackingTouch(android.widget.SeekBar seekBar)
@@ -149,52 +156,63 @@ public class kViewBase extends LinearLayout
 
     void addVoice(final Context context)
     {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(20, 20, 20, 20);
+      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT);
+      lp.setMargins(20, 20, 20, 20);
 
-        TextView tv = new TextView(context);
-        tv.setText("Voice");
-        addView(tv);
+      TextView tv = new TextView(context);
+      tv.setText("Music");
+      addView(tv);
 
-        SeekBar seeker = new SeekBar(context);
+      SeekBar seeker = new SeekBar(context);
 
-        seeker.setMax(255);
+      final AudioManager am = (AudioManager) ((Activity)context).getSystemService(Activity.AUDIO_SERVICE);
 
-        try
+      seeker.setMax(am.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL));
+
+      try
+      {
+        seeker.setProgress(android.provider.Settings.System.getInt(context.getContentResolver(),
+            Settings.System.VOLUME_MUSIC));
+        seeker.setProgress(am.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+      }
+      catch(Exception e)
+      {
+
+      }
+
+      addView(seeker);
+
+      seeker.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+        public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser)
         {
-            seeker.setProgress(android.provider.Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.VOLUME_VOICE));
+          try
+          {
+            android.provider.Settings.System.putInt(context.getContentResolver(),
+                Settings.System.VOLUME_MUSIC, progress);
+            am.setStreamVolume(AudioManager.STREAM_VOICE_CALL, progress, 0);
+          }
+          catch(Exception e)
+          {
+            Log.v("Error", e.getMessage());
+          }
         }
-        catch(Exception e)
+        public void onStartTrackingTouch(android.widget.SeekBar seekBar)
         {
 
         }
 
-        addView(seeker);
+        public void onStopTrackingTouch(android.widget.SeekBar seekBar)
+        {
 
-        seeker.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-            public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser)
-            {
-                try
-                {
-                    android.provider.Settings.System.putInt(context.getContentResolver(),
-                            Settings.System.VOLUME_VOICE, progress);
-                }
-                catch(Exception e)
-                {
+        }
+      });
+    }
 
-                }
-            }
-            public void onStartTrackingTouch(android.widget.SeekBar seekBar)
-            {
-
-            }
-
-            public void onStopTrackingTouch(android.widget.SeekBar seekBar)
-            {
-
-            }
-        });
+    public void draw_xxx(Canvas canvas)
+    {
+      canvas.saveLayerAlpha(null, 10, Canvas.ALL_SAVE_FLAG);
+      super.draw(canvas);
+      //canvas.restore();
     }
 }

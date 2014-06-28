@@ -1,6 +1,7 @@
 package com.kgm.ksensors;
 
 import android.app.Activity;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 
@@ -19,6 +20,9 @@ public class Main extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
       super.onCreate(savedInstanceState);
+
+      setVolumeControlStream(AudioManager.STREAM_MUSIC);
+      setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
 
       base = new kViewBase(this);
       setContentView(base);
